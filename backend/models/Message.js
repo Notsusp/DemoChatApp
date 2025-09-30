@@ -5,6 +5,10 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  recipient: {
+    type: String,
+    default: null // null for public messages, username for private messages
+  },
   text: {
     type: String,
     required: true,
@@ -20,5 +24,6 @@ const messageSchema = new mongoose.Schema({
 
 // Index for better query performance
 messageSchema.index({ timestamp: -1 });
+messageSchema.index({ user: 1, recipient: 1 });
 
 module.exports = mongoose.model('Message', messageSchema);

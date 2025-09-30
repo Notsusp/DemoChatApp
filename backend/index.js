@@ -51,6 +51,20 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// API info route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Chat API Server',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      auth: '/api/auth',
+      users: '/api/users'
+    },
+    docs: 'API documentation available at /api/auth and /api/users'
+  });
+});
+
 // Setup Socket.IO handlers
 setupSocketHandlers(io);
 

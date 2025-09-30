@@ -60,7 +60,18 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     // Find user by email
-    const user = await MemoryStorage.findUserByEmail(email);
+    let user = await MemoryStorage.findUserByEmail(email);
+
+    // If user doesn't exist, create demo user for demo accounts
+    if (!user && (email === 'user1@example.com' || email === 'user2@example.com')) {
+      user = await MemoryStorage.createUser({
+        username: email.split('@')[0],
+        email: email,
+        password: 'demo-password' // Set default password for demo accounts
+      });
+      console.log(`Created demo user: ${user.username}`);
+    }
+
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
