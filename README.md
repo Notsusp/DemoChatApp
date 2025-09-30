@@ -35,7 +35,7 @@ A full-stack real-time chat application built with **React**, **TypeScript**, **
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
+git clone <this-repo-url>
 cd Proiect - Online Chat App
 ```
 
