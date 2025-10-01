@@ -298,9 +298,14 @@ class MemoryStorage {
         }
 
         return await Message.find(query)
-          .sort({ timestamp: -1 })
+          .sort({ timestamp: 1 }) // Oldest first for proper chronological order
           .limit(limit)
-          .lean();
+          .lean()
+          .then(messages => messages.map(msg => ({
+            ...msg,
+            id: msg._id.toString(),
+            isPrivate: msg.recipient !== null
+          })));
       } catch (error) {
         console.error('Error getting recent messages from MongoDB:', error);
         return [];
@@ -313,7 +318,12 @@ class MemoryStorage {
 
   getRecentMessagesInMemory(limit = 50, currentUser = null) {
     if (!currentUser) {
-      return this.messages.slice(-limit);
+      const recentMessages = this.messages.slice(-limit);
+      return recentMessages.map(msg => ({
+        ...msg,
+        id: msg._id || msg.timestamp.toString(),
+        isPrivate: msg.recipient !== null
+      }));
     }
 
     // Filter messages for current user (messages they sent or received)
@@ -321,7 +331,12 @@ class MemoryStorage {
       msg.user === currentUser || msg.recipient === currentUser || msg.recipient === null
     );
 
-    return userMessages.slice(-limit);
+    const recentUserMessages = userMessages.slice(-limit);
+    return recentUserMessages.map(msg => ({
+      ...msg,
+      id: msg._id || msg.timestamp.toString(),
+      isPrivate: msg.recipient !== null
+    }));
   }
 
   async getConversationMessages(user1, user2, limit = 50) {
@@ -337,9 +352,14 @@ class MemoryStorage {
         };
 
         return await Message.find(query)
-          .sort({ timestamp: -1 })
+          .sort({ timestamp: 1 }) // Oldest first for proper chronological order
           .limit(limit)
-          .lean();
+          .lean()
+          .then(messages => messages.map(msg => ({
+            ...msg,
+            id: msg._id.toString(),
+            isPrivate: msg.recipient !== null
+          })));
       } catch (error) {
         console.error('Error getting conversation messages from MongoDB:', error);
         return [];
@@ -353,7 +373,12 @@ class MemoryStorage {
         (msg.user === user2 && msg.recipient === null)
       );
 
-      return conversationMessages.slice(-limit);
+      const recentConversationMessages = conversationMessages.slice(-limit);
+      return recentConversationMessages.map(msg => ({
+        ...msg,
+        id: msg._id || msg.timestamp.toString(),
+        isPrivate: msg.recipient !== null
+      }));
     }
   }
 }
